@@ -16,6 +16,7 @@ export default class App extends Component {
       this.createTodoItem("Make Awesome App"),
       this.createTodoItem("Have a lunch"),
     ],
+    // todoForShow: this.todoData,
   };
   createTodoItem(label) {
     return {
@@ -25,6 +26,7 @@ export default class App extends Component {
       id: this.maxId++,
     };
   }
+
   deleteItem = (id) => {
     this.setState(({ todoData }) => {
       const newArray = todoData.filter((el) => el.id !== id);
@@ -68,17 +70,60 @@ export default class App extends Component {
       };
     });
   };
+
+  searchThings = (label) => {
+    this.setState(({ todoData }) => {
+      // const todoDataCopy = [...todoData];
+      const newSearchArr = todoData.filter((el) => el.label.includes(label));
+
+      return {
+        todoData: newSearchArr,
+      };
+    });
+  };
+  onDoneFilter = (done) => {
+    this.setState(({ todoData }) => {
+      const newDoneArr = todoData.filter((el) => el.done === true);
+
+      return {
+        todoData: newDoneArr,
+      };
+    });
+  };
+  onActiveFilter = (done) => {
+    this.setState(({ todoData }) => {
+      const newActiveArr = todoData.filter((el) => el.done === false);
+
+      return {
+        todoData: newActiveArr,
+      };
+    });
+  };
+  onAllFilter = (done) => {
+    this.setState(({ todoData }) => {
+      const newAllArr = todoData.sort();
+
+      return {
+        todoData: newAllArr,
+      };
+    });
+  };
+
   render() {
     const { todoData } = this.state;
     const doneCount = todoData.filter((el) => el.done).length;
     const todoCount = todoData.length - doneCount;
-
+    console.log({ todoData });
     return (
       <div className="todo-app">
         <AppHeader toDo={todoCount} done={doneCount} />
         <div className="top-panel d-flex">
-          <SearchPanel />
-          <ItemStatusFilter />
+          <SearchPanel onSearch={this.searchThings} />
+          <ItemStatusFilter
+            onAllFilter={this.onAllFilter}
+            onActiveFilter={this.onActiveFilter}
+            onDoneFilter={this.onDoneFilter}
+          />
         </div>
 
         <TodoList
