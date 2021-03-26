@@ -17,8 +17,7 @@ export default class App extends Component {
       this.createTodoItem("Have a lunch"),
     ],
     term: "",
-
-    // todoForShow: this.todoData,
+    filter: "done", //active, all, done
   };
   createTodoItem(label) {
     return {
@@ -83,33 +82,7 @@ export default class App extends Component {
       };
     });
   };
-  onDoneFilter = (done) => {
-    this.setState(({ todoData }) => {
-      const newDoneArr = todoData.filter((el) => el.done === true);
 
-      return {
-        todoData: newDoneArr,
-      };
-    });
-  };
-  onActiveFilter = (done) => {
-    this.setState(({ todoData }) => {
-      const newActiveArr = todoData.filter((el) => el.done === false);
-
-      return {
-        todoData: newActiveArr,
-      };
-    });
-  };
-  onAllFilter = (done) => {
-    this.setState(({ todoData }) => {
-      const newAllArr = todoData.sort();
-
-      return {
-        todoData: newAllArr,
-      };
-    });
-  };
   //поиск з ним
   search(items, term) {
     if (term.length === 0) {
@@ -122,9 +95,26 @@ export default class App extends Component {
   onSearchChange = (term) => {
     this.setState({ term });
   };
+  onFilterChange = (filter) => {
+    this.setState({ filter });
+  };
+
+  filter(items, filter) {
+    switch (filter) {
+      case "all":
+        return items;
+      case "active":
+        return items.filter((item) => !item.done);
+      case "done":
+        return items.filter((item) => item.done);
+      default:
+        return items;
+    }
+  }
   render() {
-    const { todoData, term } = this.state;
-    const visibleItems = this.search(todoData, term);
+    const { todoData, term, filter } = this.state;
+    const visibleItems = this.filter(this.search(todoData, term), filter);
+    // const visibleDoneItems = this.doneItem(todoData, term);
     const doneCount = todoData.filter((el) => el.done).length;
     const todoCount = todoData.length - doneCount;
     console.log({ todoData });
@@ -134,9 +124,8 @@ export default class App extends Component {
         <div className="top-panel d-flex">
           <SearchPanel onSearchChange={this.onSearchChange} />
           <ItemStatusFilter
-            onAllFilter={this.onAllFilter}
-            onActiveFilter={this.onActiveFilter}
-            onDoneFilter={this.onDoneFilter}
+            filter={filter}
+            onFilterChange={this.onFilterChange}
           />
         </div>
 
